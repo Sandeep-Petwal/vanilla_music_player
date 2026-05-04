@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vanilla Music Player | Simple Web-Based Music Player</title>
+<meta name="description" content="Vanilla Music Player is a simple web-based music player for loading local MP3 folders, viewing metadata artwork, and playing music in a clean browser interface.">
+<meta name="keywords" content="Vanilla Music Player, web music player, browser music player, local MP3 player, simple music player, folder music player">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#c98f3a">
+<meta name="application-name" content="Vanilla Music Player">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Vanilla Music Player">
+<meta property="og:description" content="A simple web-based music player for local MP3 folders with metadata artwork and keyboard shortcuts.">
+<meta property="og:site_name" content="Vanilla Music Player">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Vanilla Music Player">
+<meta name="twitter:description" content="A simple web-based music player for local MP3 folders with metadata artwork and keyboard shortcuts.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./music-player.css">
+</head>
+<body>
+<div class="app" id="app">
+  <aside class="left-panel">
+    <div class="brand">
+      <div class="brand-copy">
+        <h1>Vanilla Music Player</h1>
+        <p>Simple web-based music player</p>
+      </div>
+      <button class="minimal-btn" id="minimalToggle" type="button" title="Toggle playlist view" aria-pressed="false" aria-label="Toggle playlist view">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+
+    <div class="panel-actions">
+      <button class="load-btn" id="loadBtn" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h18v4H3z"/><path d="M3 7v13h18V7"/><path d="M9 12h6"/><path d="M12 9v6"/></svg>
+        Open Music Folder
+      </button>
+      <input id="folderInput" type="file" accept=".mp3,audio/mpeg" webkitdirectory directory multiple hidden>
+      <p class="helper-text">Drop a folder anywhere or use the button above.</p>
+    </div>
+
+    <div class="search-wrap">
+      <input type="text" id="searchInput" placeholder="Search songs, artists, or albums..." autocomplete="off">
+    </div>
+
+    <div class="list-header" id="listHeader">READY FOR YOUR MUSIC FOLDER</div>
+
+    <div class="song-list" id="songList">
+      <div class="no-results" id="noResults">No songs match your search.</div>
+    </div>
+  </aside>
+
+  <main class="right-panel">
+    <div class="bg-glow" id="bgGlow"></div>
+    <button class="mobile-view-btn" id="mobileViewToggle" type="button" aria-label="Open playlist">Playlist</button>
+
+    <div class="empty-state" id="emptyState">
+      <svg xmlns="http://www.w3.org/2000/svg" width="68" height="68" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      <h2>Nothing playing yet</h2>
+      <p>Load or drop an MP3 folder to start listening.</p>
+    </div>
+
+    <section class="player" id="player" aria-label="Music player">
+      <div class="disc-wrap">
+        <div class="disc" id="disc">
+          <div class="disc-cover" id="discCover">
+            <img id="artworkImage" alt="Current track artwork">
+            <div class="artwork-fallback" id="artworkFallback" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 15V7l7-1v8"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="track-info">
+        <div class="track-title" id="trackTitle">Ready to play</div>
+        <div class="track-sub" id="trackSub">LOCAL LIBRARY</div>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progressBar" role="slider" aria-label="Song progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="time-row">
+          <span id="timeElapsed">0:00</span>
+          <span id="timeDuration">0:00</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="ctrl-btn" id="shuffleBtn" type="button" title="Shuffle">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 5.6 5.6"/><path d="M4 4l5.6 5.6"/></svg>
+        </button>
+        <button class="ctrl-btn" id="prevBtn" type="button" title="Previous song">
+          <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
+        </button>
+        <button class="play-btn" id="playBtn" type="button" title="Play or pause">
+          <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <svg id="pauseIcon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+        </button>
+        <button class="ctrl-btn" id="nextBtn" type="button" title="Next song">
+          <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+        </button>
+        <button class="ctrl-btn" id="repeatBtn" type="button" title="Repeat">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        </button>
+      </div>
+
+      <div class="volume-row">
+        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/></svg>
+        <input type="range" id="volumeSlider" min="0" max="100" step="1" value="80" aria-label="Volume">
+        <span class="volume-value" id="volumeValue">80%</span>
+      </div>
+    </section>
+
+    <div class="stats-bar" id="statsBar">Drop a folder anywhere to load your music.</div>
+  </main>
+</div>
+
+<div class="drop-overlay" id="dropOverlay" aria-hidden="true">
+  <div class="drop-card">
+    <strong>Drop your music folder</strong>
+    <span>Vanilla Music Player will load every MP3 it finds.</span>
+  </div>
+</div>
+
+<audio id="audioPlayer" preload="metadata"></audio>
+
+<script src="./music-player.js" defer></script>
+</body>
+</html>
